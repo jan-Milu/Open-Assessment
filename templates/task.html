@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <title>ADD/Edit tasks</title>
+    </head>
+    <body>
+            <form method = "post" action = "">
+                {{form.hidden_tag()}}
+                <p>
+                    {{form.title.label}} <br>
+                    {{form.title(size=32)}} <br>
+                    {% for error in form.title.errors %}
+                    <span style="color: red;">[{{error}}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.description.label}}<br>
+                    {{form.description(cols=32, rows=4)}} <br>
+                    {% for error in form.description.errors %}
+                    <span style="color: red;">[{{error}}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{form.is_complete()}} {{form.is_complete.label}}
+                </p>
+                <p> {{form.submit}}</p>
+            </form>
+    </body>
+</html>

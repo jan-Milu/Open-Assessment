@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>All Tasks</title>
+    </head>
+    <body>
+        <h1>All Tasks</h1>
+        <a href="{{ url_for('task')}}">Add New Task</a>
+        <ul>
+            {% for task in tasks %}
+            <li>
+                <strong>Title: </strong> {{task.title}} <br>
+                <strong>Description: </strong> {{task.description}}<br>
+                <form action="{{url_for('update_task_status', task_id = task.id)}}" method = "post">
+                    <input type="checkbox" name="is_complete" value="1" {%if task.is_complete%}checked{%endif%} onchange = "this.form.submit()">
+                    <strong>Completed:</strong> <span>{{task.is_complete}}</span><br>
+                </form>
+            </li>
+            {%else%}
+            <li>No tasks found</li>
+            {%endfor%}
+        </ul>
+    </body>
+</html>
