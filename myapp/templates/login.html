@@ -1,86 +1,29 @@
-<!-- myapp/templates/register.html -->
+<!-- myapp/templates/login.html -->
 {% extends "base.html" %}
-<!--
-  Inherits from base.html:
-  - Grabs the <head> and body structure
-  - Fills in title and content blocks below
--->
 
-{% block title %}
-  Register
-  <!--
-    Overrides the <title> in base.html.
-    The browser tab will show “Register”.
-  -->
-{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
-  <!-- Page heading -->
-  <h2>Register</h2>
-
-  <!--
-    Form start:
-    - method="POST" → sends form data in request body
-    - CSRF token is injected by {{ form.hidden_tag() }}
-  -->
+  <h2>Login</h2>
   <form method="POST">
     {{ form.hidden_tag() }}
 
-    <!--
-      Email field:
-      - {{ form.email.label }} outputs the <label> element
-      - {{ form.email() }} outputs the <input> element
-      - DataRequired, Email, Length validators applied in forms.py
-    -->
-    <div>
-      {{ form.email.label }}<br>
-      {{ form.email(size=32) }}
-      <!-- size=32 sets input width; optional -->
-    </div>
-
-    <!--
-      Username field:
-      - Minimum 3, maximum 20 characters enforced server-side
-    -->
     <div>
       {{ form.username.label }}<br>
       {{ form.username(size=20) }}
     </div>
 
-    <!--
-      Password field:
-      - Minimum 6, maximum 30 characters
-      - Input type=”password” hides text
-    -->
     <div>
       {{ form.password.label }}<br>
       {{ form.password() }}
     </div>
 
-    <!--
-      Confirm password field:
-      - EqualTo validator ensures it matches the password field
-    -->
-    <div>
-      {{ form.confirm_password.label }}<br>
-      {{ form.confirm_password() }}
-    </div>
-
-    <!--
-      Submit button:
-      - Triggers form.validate_on_submit() in routes.py
-    -->
     <div>
       {{ form.submit() }}
     </div>
   </form>
 
-  <!--
-    Link to login page for existing users:
-    - url_for('login') generates the correct URL for the login route
-  -->
   <p>
-    Already have an account?
-    <a href="{{ url_for('login') }}">Login here</a>.
+    New here? <a href="{{ url_for('register') }}">Create an account</a>.
   </p>
 {% endblock %}
