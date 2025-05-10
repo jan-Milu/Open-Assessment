@@ -2,3 +2,6 @@ Flask
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-WTF
+Flask-Bcrypt
+Flask-Login
+email-validator

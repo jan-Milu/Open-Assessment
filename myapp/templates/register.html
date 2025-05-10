@@ -1,0 +1,53 @@
+<!-- myapp/templates/login.html -->
+{% extends "base.html" %}
+<!-- Inherits header, flash messaging, and content block -->
+
+{% block title %}
+  Login
+  <!-- Browser tab title set here -->
+{% endblock %}
+
+{% block content %}
+  <h2>Login</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <!-- CSRF token -->
+
+    <!--
+      Username input:
+      - Must be between 3 and 20 characters (forms.py)
+    -->
+    <div>
+      {{ form.username.label }}<br>
+      {{ form.username(size=20) }}
+    </div>
+
+    <!--
+      Password input:
+      - Hidden characters
+    -->
+    <div>
+      {{ form.password.label }}<br>
+      {{ form.password() }}
+    </div>
+
+    <!--
+      Submit button:
+      - Posts back to /login route
+      - Flask-WTF’s validate_on_submit() runs validators
+    -->
+    <div>
+      {{ form.submit() }}
+    </div>
+  </form>
+
+  <!--
+    Registration link for new users
+    - url_for('register') → /register
+  -->
+  <p>
+    New here?
+    <a href="{{ url_for('register') }}">Create an account</a>.
+  </p>
+{% endblock %}

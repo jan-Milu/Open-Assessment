@@ -1,0 +1,40 @@
+<!-- myapp/templates/base.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Character encoding -->
+    <meta charset="utf-8">
+    <!--
+      {% block title %}{% endblock %}
+
+      - Defines a “title” block that child templates can override.
+      - Anything rendered inside this block becomes the <title> of the page.
+    -->
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <!--
+      Flash messages area:
+      - get_flashed_messages(with_categories=true) returns a list of (category, message) tuples
+      - We loop and display each as a <li> with a CSS class equal to the category
+      - Categories: 'success', 'danger', etc. (used in routes.py via flash(..., 'success'))
+    -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <!-- category → CSS hook, message → text shown to user -->
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!--
+      Main content block:
+      - Child templates must define {% block content %}{% endblock %}
+      - Everything inside that block will be injected here.
+    -->
+    {% block content %}{% endblock %}
+  </body>
+</html>

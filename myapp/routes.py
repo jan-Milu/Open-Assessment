@@ -1,64 +1,54 @@
-from flask import Flask, render_template, redirect, url_for, request
-from myapp import app, db
-from myapp.models import Task
-from myapp.forms import TaskForm
+# All app routes (register, login, dashboard, logout)
+from flask import render_template, redirect, url_for, flash, request
+from flask_login import login_user, logout_user, login_required, current_user
+from .forms import RegistrationForm, LoginForm
+from .extensions import db, login_manager
 
-@app.route('/task', methods=['GET', 'POST'])
-def task():
-    form = TaskForm()
-    if form.validate_on_submit():
-        new_task = Task(
-            title = form.title.data,
-            description = form.description.data,
-            is_complete = form.is_complete.data,
-            priority = form.priority.data
-        )
-        db.session.add(new_task)
-        db.session.commit()
-        return redirect(url_for('display_tasks'))
-    return render_template('task.html', form = form)
+def init_routes(app):
+    from .models import User  # Deferred import to avoid circular dependency
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        # Flask-Login uses this to reload user from session
+        return User.query.get(int(user_id))
 
-@app.route('/task/list/')
-def display_tasks():
-    tasks = Task.query.order_by(Task.priority).all()
-    return render_template('task_list.html',tasks=tasks)
+    @app.route('/register', methods=['GET', 'POST'])
+    def register():
+        from .models import User  # Safe local import
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        form = RegistrationForm()
+        if form.validate_on_submit():
+            # Create user and hash password
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('Account created!', 'success')
+            return redirect(url_for('login'))
+        return render_template('register.html', form=form)
 
-@app.route('/task/update_status/<int:task_id>', methods = ["POST"])
-def update_task_status(task_id):
-    task = Task.query.get_or_404(task_id)
-    task.is_complete = 'is_complete' in request.form
-    db.session.commit()
-    return redirect(url_for('display_tasks'))
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        from .models import User  # Safe local import
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        form = LoginForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(username=form.username.data).first()
+            if user and user.check_password(form.password.data):
+                login_user(user)
+                return redirect(url_for('dashboard'))
+            flash('Invalid credentials.', 'danger')
+        return render_template('login.html', form=form)
 
-@app.route('/task/delete/<int:task_id>', methods=["POST"])
-def delete_task(task_id):
-    task = Task.query.get_or_404(task_id)
-    db.session.delete(task)
-    db.session.commit()
-    return redirect(url_for('display_tasks'))
+    @app.route('/logout')
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for('login'))
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
-
-@app.route('/user/<name>')
-def user(name):
-    personal = f'<h1> Hello, {name}! </h1>'
-    instruc = '<p> Change the name in the <em> browser address bar </em> and reload page,</p>'
-    return personal + instruc
-
-@app.route("/hello/<name>")
-def hello(name):
-    return render_template('hello.html', name = name)
-
-@app.route('/users')
-def users():
-    user_names = ['Angus', 'Isaac', 'Milo', 'Brandan']
-    return render_template('users.html', names=user_names)
-
-@app.route('/letter/<name>')
-def letter(name):
-    return "The fifth letter of this name is: " + name[4]
-
-
+    @app.route('/')
+    @login_required
+    def dashboard():
+        return f'Hello, {current_user.username}!'  # Simple landing page
