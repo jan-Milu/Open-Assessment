@@ -1,0 +1,26 @@
+{# Render lap form.
+
+This macro is intended to render both regular lap subforms (received from the
+server) and the template form used to dynamically add more forms.
+
+Arguments:
+    - subform: Form object to render
+    - index: Index of the form. For proper subforms rendered in the form loop,
+             this should match `loop.index0`, and for the template it should be
+             '_'
+#}
+{%- macro render_question_form(subform, index) %}
+    <div id="question-{{ index }}-form" class="{% if index != '_' %}subform{% else %}is-hidden{% endif %}" data-index="{{ index }}">
+        <div>
+            {{ subform.question.label }}
+            {{ subform.question }}
+        </div>
+        <div>
+            {{ subform.answer.label }}
+            {{ subform.answer}}
+        </div>
+
+        <a class="remove" href="#">Remove</a>
+        <hr/>
+    </div>
+{%- endmacro %}

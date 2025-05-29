@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-  <h2>Login</h2>
+  <h2>Register</h2>
   <form method="POST">
     {{ form.hidden_tag() }}
     <div>
@@ -11,15 +11,19 @@
       {{ form.username(size=20) }}
     </div>
     <div>
+      {{ form.email.label }}<br>
+      {{ form.email(size=20) }}
+    </div>
+    <div>
       {{ form.password.label }}<br>
       {{ form.password() }}
+    </div>
+    <div>
+      {{ form.confirm_password.label }}<br>
+      {{ form.confirm_password() }}
     </div>
     <div>
       {{ form.submit() }}
     </div>
   </form>
-  <p>
-    New here?
-    <a href="{{ url_for('register') }}">Create an account</a>.
-  </p>
 {% endblock %}

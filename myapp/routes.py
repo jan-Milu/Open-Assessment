@@ -1,7 +1,7 @@
 # All app routes (register, login, dashboard, logout)
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, QuizCreationForm
 from .extensions import db, login_manager
 
 def init_routes(app):
@@ -24,8 +24,10 @@ def init_routes(app):
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
+            print("hi??")
             flash('Account created!', 'success')
-            return redirect(url_for('login'))
+            login_user(user)
+            return redirect(url_for('dashboard'))
         return render_template('register.html', form=form)
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -47,6 +49,29 @@ def init_routes(app):
     def logout():
         logout_user()
         return redirect(url_for('login'))
+
+    @app.route('/createquiz', methods=['GET', 'POST'])
+    @login_required
+    def createquiz():
+        form = QuizCreationForm()
+        if form.validate_on_submit():
+            quiz = Quiz(title=form.title.data)
+
+            db.session.add(quiz)
+
+            for question in form.questions.data:
+                q = Question(**question)
+
+                quiz.questions.append(q)
+
+            db.session.commit()
+
+            return redirect(url_for('dashboard'))
+        return render_template('quizcreator.html', form=form)
+
+    @app.route('/play')
+    def play():
+        return render_template('game.html')
 
     @app.route('/')
     @login_required
