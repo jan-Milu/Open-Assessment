@@ -1,7 +1,7 @@
 # All app routes (register, login, dashboard, logout)
 from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from .forms import RegistrationForm, LoginForm, QuizCreationForm
+from .forms import RegistrationForm, LoginForm, QuizCreationForm, QuestionForm
 from .extensions import db, login_manager
 
 def init_routes(app):
@@ -53,7 +53,9 @@ def init_routes(app):
     @app.route('/createquiz', methods=['GET', 'POST'])
     @login_required
     def createquiz():
+        from .models import Quiz, Question
         form = QuizCreationForm()
+        template_form = QuestionForm(prefix='question-_-')
         if form.validate_on_submit():
             quiz = Quiz(title=form.title.data)
 
@@ -67,7 +69,7 @@ def init_routes(app):
             db.session.commit()
 
             return redirect(url_for('dashboard'))
-        return render_template('quizcreator.html', form=form)
+        return render_template('quizcreator.html', form=form, _template=template_form)
 
     @app.route('/play')
     def play():

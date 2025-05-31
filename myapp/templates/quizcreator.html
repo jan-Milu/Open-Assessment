@@ -19,24 +19,45 @@
     {{ form.hidden_tag() }}
 
     <div id="subforms-container">
+      {% for subform in form.questions %}
+        {{ macros.render_question_form(subform, loop.index0) }}
+      {% endfor %}
     </div>
 
     <div>
       {{ form.submit() }}
     </div>
 
-    <script>
-      function construct(index) {
-        return {{ macros.render_question_form({{ subform }}, index) }}
-      }
+    {{ macros.render_question_form(_template, '_') }}
+
+    <!-- <script>
+      let index = 0
+
       function addSubForm() {
-        //const container = document.getElementById("subforms-container");
-        //subform = {{ macros.render_question_form(subform, container.childElementCount()) }};
+        const container = document.getElementById("subforms-container");
+        subform = macros.render_question_form(subform, container.childElementCount()); this should be in double braces if used
 
-        //container.appendChild(subform);
-
-
+        container.appendChild(subform);
       }
+    </script> -->
+
+    <script>
+      function addSubForm() {
+        const template = document.getElementById("question-_-form");
+        var subform = template.cloneNode(true);
+        const container = document.getElementById("subforms-container");
+
+        index = container.childElementCount;
+
+        subform.id = `question-${index}-form`;
+        subform.className = "subform";
+        subform.setAttribute("data-index", index);
+
+        container.appendChild(subform);
+        return false
+      }
+
+
     </script>
 
   </form>

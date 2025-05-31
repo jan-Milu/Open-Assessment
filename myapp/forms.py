@@ -29,12 +29,12 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
-class Question(Form):
+class QuestionForm(Form):
     question = StringField("Question", validators=[DataRequired(), Length(0, 200)])
     answer = StringField("Answer", validators=[DataRequired(), Length(0, 50)])
 
 class QuizCreationForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired(), Length(3, 100)])
-    questions = FieldList(FormField(Question), min_entries=1, max_entries=100)
+    questions = FieldList(FormField(QuestionForm), min_entries=1, max_entries=100)
     submit = SubmitField("Submit")
     
