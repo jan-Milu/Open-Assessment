@@ -6,8 +6,10 @@ directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 class Game {
     constructor() {
         this.player = new Player();
+        this.food = []
 
         window.addEventListener("keydown", this.input.bind(this));
+        this.food.push(new Food(200, 200, "a", true));
     }
 
     input(e) {
@@ -32,20 +34,40 @@ class Game {
 
     update() {
         this.player.move();
+
+        this.food.some(food => {
+            console.log("f");
+            if (food.x == this.player.segments[this.player.segments.length - 1].x && food.y == this.player.segments[this.player.segments.length - 1].y) {
+                console.log("hi");
+                if (food.correct == true) {
+                    this.food = [];
+                    this.player.grow();
+
+                    this.food.push(new Food(200, 200, "a", true));
+                    console.log("et");
+                    return true;
+                }
+            }
+        });
+
         this.clear();
         this.player.draw();
 
-        console.log("updated??");
+        this.food.forEach(food => {
+            food.draw();
+        });
+
+        console.log(this.player.segments.length);
     }
 }
 
 class Player {
     constructor() {
-        this.segments = [new Head(this, 100, 100)]; //index 0 is the last segment, counting up towards head
+        this.segments = [new Head(this, 50, 50)]; //index 0 is the last segment, counting up towards head
     }
 
     move() {
-        for (let i = this.segments.length - 1; i >= 0; i--) {
+        for (let i = 0; i < this.segments.length; i++) {
             this.segments[i].move();
         }
     }
@@ -53,11 +75,13 @@ class Player {
     draw() {
         for (let i = 0; i < this.segments.length; i++) {
             this.segments[i].draw();
+            console.log(this.segments[i].x, this.segments[i].y);
         }
     }
 
     grow() {
         this.segments.unshift(new Segment(this));
+        console.log("grw");
     }
 
     turn(dir) {
@@ -72,19 +96,23 @@ class Head {
         this.x = x;
         this.y = y;
         this.dir = 0;
+        this.nextDir = 0;
+        this.turned = false;
     }
 
     move() {
-        this.x = this.x + 100 * directions[this.dir][0];
-        this.y = this.y + 100 * directions[this.dir][1];
+        this.dir = this.nextDir;
+        this.x = this.x + 50 * directions[this.dir][0];
+        this.y = this.y + 50 * directions[this.dir][1];
         console.log(this.x, this.y);
+        this.turned = false;
     }
 
     turn(dir) {
-        if ((dir + this.dir) % 2 != 0) {
-            this.dir = dir;
+        if ((dir + this.dir) % 2 != 0 && this.turned == false) {
+            this.nextDir = dir;
+            this.turned = true;
         }
-        console.log(this.dir);
     }
 
     draw() {
@@ -92,9 +120,9 @@ class Head {
 
         ctx.fillStyle = "green";
         ctx.beginPath();
-        ctx.moveTo(this.x + 50 * dx, this.y + 50 * dy);
-        ctx.lineTo(this.x - 50 * dx + 50 * dy, this.y - 50 * dy + 50 * dx);
-        ctx.lineTo(this.x - 50 * dx - 50 * dy, this.y - 50 * dy - 50 * dx);
+        ctx.moveTo(this.x + 25 * dx, this.y + 25 * dy);
+        ctx.lineTo(this.x - 25 * dx + 25 * dy, this.y - 25 * dy + 25 * dx);
+        ctx.lineTo(this.x - 25 * dx - 25 * dy, this.y - 25 * dy - 25 * dx);
         ctx.closePath();
         ctx.fill();
         console.log("head");
@@ -106,30 +134,51 @@ class Segment {
         this.player = player;
         this.next = player.segments[0];
 
-        this.x = this.next.x;
-        this.y = this.next.y;
         this.dir = this.next.dir;
+        this.nextDir = this.nextDir;
+
+        this.x = this.next.x;// - 50 * directions[this.dir][0];
+        this.y = this.next.y;// - 50 * directions[this.dir][1];
     }
 
     move() {
         this.x = this.next.x;
         this.y = this.next.y;
-        this.dir = this.next.dir;
+        this.dir = this.nextDir;
+        this.nextDir = this.next.nextDir;
     }
 
     draw() {
         const [dx, dy] = directions[this.dir];
+        const [ndx, ndy] = directions[this.nextDir];
 
         ctx.fillStyle = "green";
         ctx.beginPath();
-        ctx.moveTo(this.x - 50 * dx - 50 * dy, this.y - 50 * dy - 50 * dx);
-        ctx.lineTo(this.x - 50 * dx + 50 * dy, this.y - 50 * dy + 50 * dx);
+        ctx.moveTo(this.x - 25 * dx - 20 * dy, this.y - 25 * dy + 20 * dx);
+        ctx.lineTo(this.x - 25 * dx + 20 * dy, this.y - 25 * dy - 20 * dx);
+        
+        
+        ctx.lineTo(this.x + 25 * ndx + 20 * ndy, this.y + 25 * ndy - 20 * ndx);
+        ctx.lineTo(this.x + 25 * ndx - 20 * ndy, this.y + 25 * ndy + 20 * ndx);
 
-        ctx.lineTo(this.x + 50 * dx - 50 * dy, this.y + 50 * dy - 50 * dx);
-        ctx.lineTo(this.x + 50 * dx + 50 * dy, this.y + 50 * dy + 50 * dx);
 
         ctx.closePath();
         ctx.stroke();
+    }
+}
+
+class Food {
+    constructor(x, y, answer, correct) {
+        this.x = x;
+        this.y = y;
+        
+        this.answer = answer;
+        this.correct = correct;
+    }
+
+    draw() {
+        ctx.fillStyle = "red";
+        ctx.fillRect(this.x - 25, this.y - 25, 50, 50);
     }
 }
 
@@ -137,4 +186,4 @@ const game = new Game();
 canvas.width = 480*2;
 canvas.height = 270*2;
 
-setInterval(() => game.update(), 1000);
+setInterval(() => game.update(), 500);
