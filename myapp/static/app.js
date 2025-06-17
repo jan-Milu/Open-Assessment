@@ -1,6 +1,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
+// https://stackoverflow.com/questions/8205828/html5-canvas-performance-and-optimization-tips-tricks-and-coding-best-practices/8485927#8485927
 directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
 class Game {

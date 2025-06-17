@@ -1,8 +1,8 @@
 <!-- myapp/templates/login.html -->
-{% extends "base.html" %}
+{% extends "quizsnake.html" %}
 {% import "macros.html" as macros %}
 
-{% block title %}Create Quiz{% endblock %}
+<!--{% block title %}Create Quiz{% endblock %}-->
 
 {% block content %}
   <h2>Quiz Creator</h2>
@@ -13,7 +13,7 @@
       {{ form.title(size=20) }}
     </div>
 
-    <button type="button" onclick="addSubForm()">Add Lap</button>
+    <button type="button" onclick="addSubForm()">Add Question</button>
     <hr/>
 
     {{ form.hidden_tag() }}
@@ -30,17 +30,6 @@
 
     {{ macros.render_question_form(_template, '_') }}
 
-    <!-- <script>
-      let index = 0
-
-      function addSubForm() {
-        const container = document.getElementById("subforms-container");
-        subform = macros.render_question_form(subform, container.childElementCount()); this should be in double braces if used
-
-        container.appendChild(subform);
-      }
-    </script> -->
-
     <script>
       function addSubForm() {
         const template = document.getElementById("question-_-form");
@@ -54,10 +43,27 @@
         subform.setAttribute("data-index", index);
 
         container.appendChild(subform);
-        return false
+        return false;
       }
 
+      function removeSubForm(subform) {
+        subform.remove();
+        reIndex();
+        return false;
+      }
 
+      function reIndex() {
+        const container = document.getElementById("subforms-container");
+
+        const children = container.childNodes;
+
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          console.log(child);
+          child.id = `question-${i}-form`;
+          child.setAttribute("data-index", i);
+        }
+      }
     </script>
 
   </form>

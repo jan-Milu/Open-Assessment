@@ -5,6 +5,20 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
+  <header>
+    <nav> <!--https://www.w3schools.com/howto/howto_css_dropdown_navbar.asp-->
+      <a href="/home">Home</a>
+      <div class="dropdown">
+        <button class="dropbtn"> Games</button>
+        <div class="dropdown-content">
+          <a href="/quizsnake/">Quiz Snake</a>
+          <i>Coming Soon</i>
+        </div>
+      </div>
+      <a href="/about">About us</a>
+    </nav>
+    {% block header %}{% endblock %}
+  </header>
   <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}

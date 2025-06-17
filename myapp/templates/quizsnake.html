@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Snake{% endblock %}
+
+{% block header %}
+  <h2>Quiz Snake</h2>
+  
+  <nav class="tabs">
+    <a href="/quizsnake" {% if page == "default" %} class = "active" {% endif %}>About</a>
+    <a href="/quizsnake/play" {% if page == "play" %} class = "active" {% endif %}>Play</a>
+    <a href="/quizsnake/createquiz" {% if page == "createquiz" %} class = "active" {% endif %}>Create Quiz</a>
+  </nav>
+
+{% endblock %}
+
+{% block content %}
+ <p>testing</p>
+{% endblock %}

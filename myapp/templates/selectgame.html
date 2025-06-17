@@ -1,0 +1,34 @@
+{% extends "quizsnake.html" %}
+
+{% block content %}
+    <form>
+        <label for="seach_terms">Search:</label><br>
+        <input type="text" id="search_terms" name="search_terms"><br>
+        <input type="submit" value="submit">
+    </form>
+
+    <ul id="quiz_list"></ul>
+
+    <script>
+        function search() {
+            //term = document.querySelector('#search_terms').value;
+            const params = new URLSearchParams(window.location.search)
+            const term = params.get('search_terms');
+            console.log(term);
+
+            fetch(`/get_quizzes/${term}`)
+                .then(response => response.json())
+                .then(data => {
+                    list = document.getElementById("quiz_list");
+
+                    for (let i = 0; i < data.length; i++) {
+                        const li = document.createElement("li");
+                        li.textContent = data[i].title;
+                        list.appendChild(li);
+                    }
+                });
+        }
+
+        search();
+    </script>
+{% endblock %}
