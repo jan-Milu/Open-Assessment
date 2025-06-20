@@ -37,5 +37,8 @@ class Question(db.Model):
     foreignkey = db.Column(db.Integer, db.ForeignKey('quizzes.id'))
     question = db.Column(db.String(200), nullable=False)
     answer = db.Column(db.String(50), nullable=False)
+    falseanswer1 = db.Column(db.String(50), nullable=False)
+    falseanswer2 = db.Column(db.String(50), nullable=True)
+    falseanswer3 = db.Column(db.String(50), nullable=True)
 
     quiz = db.relationship("Quiz", backref=db.backref("questions", lazy="dynamic", collection_class=list))

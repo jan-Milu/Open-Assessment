@@ -9,7 +9,7 @@ class RegistrationForm(FlaskForm):
     #email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
     username = StringField('Username', validators=[DataRequired(), Length(3, 20)])
     email = StringField('Email', validators=[DataRequired(), Length(3, 50)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(6, 30)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(8, 30)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
@@ -32,6 +32,9 @@ class LoginForm(FlaskForm):
 class QuestionForm(Form):
     question = StringField("Question", validators=[DataRequired(), Length(0, 200)])
     answer = StringField("Answer", validators=[DataRequired(), Length(0, 50)])
+    falseanswer1 = StringField("FalseAnswer1", validators=[DataRequired(), Length(0, 50)])
+    falseanswer2 = StringField("FalseAnswer2", validators=[Length(0, 50)])
+    falseanswer3 = StringField("FalseAnswer3", validators=[Length(0, 50)])
 
 class QuizCreationForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired(), Length(3, 100)])

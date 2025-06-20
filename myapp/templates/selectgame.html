@@ -12,9 +12,8 @@
     <script>
         function search() {
             //term = document.querySelector('#search_terms').value;
-            const params = new URLSearchParams(window.location.search)
+            const params = new URLSearchParams(window.location.search);
             const term = params.get('search_terms');
-            console.log(term);
 
             fetch(`/get_quizzes/${term}`)
                 .then(response => response.json())
@@ -22,8 +21,9 @@
                     list = document.getElementById("quiz_list");
 
                     for (let i = 0; i < data.length; i++) {
-                        const li = document.createElement("li");
+                        const li = document.createElement("a");
                         li.textContent = data[i].title;
+                        li.href = `/quizsnake/game?quiz=${data[i].id}`;
                         list.appendChild(li);
                     }
                 });

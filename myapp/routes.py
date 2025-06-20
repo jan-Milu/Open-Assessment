@@ -15,20 +15,33 @@ def init_routes(app):
     @app.route('/register', methods=['GET', 'POST'])
     def register():
         from .models import User  # Safe local import
-        if current_user.is_authenticated:
-            return redirect(url_for('dashboard'))
+        #if current_user.is_authenticated:
+        #    return redirect(url_for('dashboard'))
         form = RegistrationForm()
         if form.validate_on_submit():
             # Create user and hash password
-            user = User(username=form.username.data, email=form.email.data)
-            user.set_password(form.password.data)
-            db.session.add(user)
-            db.session.commit()
-            print("hi??")
-            flash('Account created!', 'success')
-            login_user(user)
-            return redirect(url_for('dashboard'))
+            valid_pass = validate_password(form.password.data)
+            print(valid_pass)
+            if valid_pass[0]:
+                user = User(username=form.username.data, email=form.email.data)
+                user.set_password(form.password.data)
+                db.session.add(user)
+                db.session.commit()
+                print("hi??")
+                flash('Account created!', 'success')
+                login_user(user)
+                return redirect(url_for('dashboard'))
+            else:
+                for msg in valid_pass[1]: flash(msg) 
         return render_template('register.html', form=form)
+
+    def validate_password(password):
+        problems = []
+        if not any(c.isupper() for c in password): problems.append("Password must contain at least 1 captial letter")
+        if not any(c.islower() for c in password): problems.append("Password must contain at least 1 lowercase letter")
+        if not any(c.isdigit() for c in password): problems.append("Password must contain at least 1 number")
+
+        return len(problems) == 0, problems
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -117,3 +130,10 @@ def init_routes(app):
         quizzes = Quiz.query.filter(Quiz.title.contains(term))
         result = [{"id": q.id, "title": q.title} for q in quizzes]
         return jsonify(result)
+
+    @app.route('/get_questions/<int:id>', methods=['GET', 'POST'])
+    def get_questions(id):
+        from .models import Quiz, Question
+        questions = Question.query.filter_by(Quiz.id == Question.foreignid)
+        result = [{"question": q.question, "answer": q.answer, "false_answers": [q.falseanswer1, q.falseanswer2, q.falseanswer3]} for q in questions]
+        return jsonify(result)     

@@ -42,6 +42,8 @@
         subform.className = "subform";
         subform.setAttribute("data-index", index);
 
+        replaceInputIndices(subform, "_", index);
+
         container.appendChild(subform);
         return false;
       }
@@ -55,14 +57,28 @@
       function reIndex() {
         const container = document.getElementById("subforms-container");
 
-        const children = container.childNodes;
+        const children = container.children;
 
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
-          console.log(child);
-          child.id = `question-${i}-form`;
-          child.setAttribute("data-index", i);
+          if (child.hasAttribute("data-index")) { // then it is a subform ie not button
+            replaceInputIndices(child, child.getAttribute("data-index"), i);
+
+            child.id = `question-${i}-form`;
+            child.setAttribute("data-index", i);
+          }
         }
+      }
+
+      function replaceInputIndices(subform, prevIndex, index) {
+        const divs = subform.children;
+        for (let i = 0; i < divs.length - 2; i++) {
+          const children = divs[i].children;
+          console.log(children)
+          children[0].for = toString(children[0].for).replace(prevIndex, index);
+          children[1].id = toString(children[1].id).id.replace(prevIndex, index);
+        }
+
       }
     </script>
 
