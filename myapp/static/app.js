@@ -6,7 +6,8 @@ directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 class Game {
     constructor() {
         this.player = new Player();
-        this.food = []
+        this.food = [];
+        this.taken = [];
 
         window.addEventListener("keydown", this.input.bind(this));
         this.food.push(new Food(200, 200, "a", true));
@@ -36,9 +37,7 @@ class Game {
         this.player.move();
 
         this.food.some(food => {
-            console.log("f");
             if (food.x == this.player.segments[this.player.segments.length - 1].x && food.y == this.player.segments[this.player.segments.length - 1].y) {
-                console.log("hi");
                 if (food.correct == true) {
                     this.food = [];
                     this.player.grow();
@@ -58,6 +57,18 @@ class Game {
         });
 
         console.log(this.player.segments.length);
+    }
+
+    next_question() {
+        this.food = [];
+        
+        const question = questions[Math.floor(Math.random() * questions.length)];
+
+        this.food.push(new Food(this.taken, question.answer, true));
+
+        question.false_answers.forEach(ans => {
+            if (ans != null) this.food.push(new Food(this.taken, ans, false));
+        });
     }
 }
 
@@ -185,5 +196,10 @@ class Food {
 const game = new Game();
 canvas.width = 480*2;
 canvas.height = 270*2;
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get('quiz');
+
+let questions = fetch(`/get_questions/${id}`).then(response => response.json());
 
 setInterval(() => game.update(), 500);
