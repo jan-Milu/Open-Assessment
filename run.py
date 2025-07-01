@@ -5,4 +5,4 @@ app = create_app()  # Creates the Flask app with configurations and blueprints
 
 if __name__ == "__main__":
     # Runs the app in debug mode for live reloads and detailed errors
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

@@ -74,8 +74,11 @@ def init_routes(app):
 
             db.session.add(quiz)
 
+            print(form.questions.data)
+
             for question in form.questions.data:
                 q = Question(**question)
+                print(q)
 
                 quiz.questions.append(q)
 
@@ -93,25 +96,36 @@ def init_routes(app):
     def quizsnake():
         return render_template('quizsnake.html', page="default")
 
-    @app.route('/quizsnake/<page>')
+    @app.route('/quizsnake/<page>', methods=['GET', 'POST'])
     @login_required
     def quizsnake_subpage(page):
         if page == "play":
             return render_template('selectgame.html', page=page)
 
+        if page == "game":
+            return render_template('game.html', page="play")
+
         if page == "createquiz":
             from .models import Quiz, Question
             form = QuizCreationForm()
-            template_form = QuestionForm(prefix='question-_-')
+            template_form = QuestionForm(prefix='questions-_-')
             if form.validate_on_submit():
                 quiz = Quiz(title=form.title.data)
 
                 db.session.add(quiz)
 
+                print(form)
+                print(quiz.questions)
+
                 for question in form.questions.data:
+                    
                     q = Question(**question)
 
+                    print(q)
+                    print(question)
+
                     quiz.questions.append(q)
+                print(quiz.questions)
 
                 db.session.commit()
 
@@ -133,7 +147,9 @@ def init_routes(app):
 
     @app.route('/get_questions/<int:id>', methods=['GET', 'POST'])
     def get_questions(id):
-        from .models import Quiz, Question
-        questions = Question.query.filter_by(Quiz.id == Question.foreignid)
+        from .models import Question
+        questions = Question.query.filter(Question.foreignkey == id)
         result = [{"question": q.question, "answer": q.answer, "false_answers": [q.falseanswer1, q.falseanswer2, q.falseanswer3]} for q in questions]
-        return jsonify(result)     
+        a = jsonify(result)
+        print(a)
+        return a     

@@ -10,7 +10,7 @@ Arguments:
              '_'
 #}
 {%- macro render_question_form(subform, index) %}
-    <div id="question-{{ index }}-form" class="{% if index != '_' %}subform{% else %}is-hidden{% endif %}" data-index="{{ index }}">
+    <div id="questions-{{ index }}-form" class="{% if index != '_' %}subform{% else %}is-hidden{% endif %}" data-index="{{ index }}">
         <div>
             {{ subform.question.label }}
             {{ subform.question }}

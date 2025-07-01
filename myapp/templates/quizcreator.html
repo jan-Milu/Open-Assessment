@@ -28,17 +28,18 @@
       {{ form.submit() }}
     </div>
 
+    </form>
     {{ macros.render_question_form(_template, '_') }}
 
     <script>
       function addSubForm() {
-        const template = document.getElementById("question-_-form");
+        const template = document.getElementById("questions-_-form");
         var subform = template.cloneNode(true);
         const container = document.getElementById("subforms-container");
 
         index = container.childElementCount;
 
-        subform.id = `question-${index}-form`;
+        subform.id = `questions-${index}-form`;
         subform.className = "subform";
         subform.setAttribute("data-index", index);
 
@@ -64,7 +65,7 @@
           if (child.hasAttribute("data-index")) { // then it is a subform ie not button
             replaceInputIndices(child, child.getAttribute("data-index"), i);
 
-            child.id = `question-${i}-form`;
+            child.id = `questions-${i}-form`;
             child.setAttribute("data-index", i);
           }
         }
@@ -72,15 +73,18 @@
 
       function replaceInputIndices(subform, prevIndex, index) {
         const divs = subform.children;
+
         for (let i = 0; i < divs.length - 2; i++) {
           const children = divs[i].children;
           console.log(children)
-          children[0].for = toString(children[0].for).replace(prevIndex, index);
-          children[1].id = toString(children[1].id).id.replace(prevIndex, index);
+          text = children[1].id.replace(prevIndex.toString(), index.toString());
+          console.log(text);
+          children[1].id = text;
+          children[1].name = text;
+          children[0].setAttribute("for", text);
+          
         }
 
       }
     </script>
-
-  </form>
 {% endblock %}

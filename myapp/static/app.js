@@ -1,20 +1,30 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 // https://stackoverflow.com/questions/8205828/html5-canvas-performance-and-optimization-tips-tricks-and-coding-best-practices/8485927#8485927
-directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+var colors = ["red", "orange", "royalblue", "seagreen"]
+
+// add msgs to page, color, test test, then good!
+// msgs on page with elements in html pls
+// also have some speed
 
 class Game {
-    constructor() {
+    constructor(questions) {
         this.player = new Player();
         this.food = [];
         this.taken = [];
+        this.done = [];
+        this.questions = questions;
+        this.score = 0;
 
         window.addEventListener("keydown", this.input.bind(this));
-        this.food.push(new Food(200, 200, "a", true));
+        
+        this.next_question();
+        this.running = setInterval(() => this.update(), 500);
     }
 
     input(e) {
-        console.log("input");
+        //console.log("input");
         if (e.key == "w" || e.key == "ArrowUp") {
             this.player.turn(3);
         } 
@@ -38,14 +48,12 @@ class Game {
 
         this.food.some(food => {
             if (food.x == this.player.segments[this.player.segments.length - 1].x && food.y == this.player.segments[this.player.segments.length - 1].y) {
-                if (food.correct == true) {
-                    this.food = [];
-                    this.player.grow();
+                if (food.correct == true) this.score = this.score + 1;
+                this.player.grow();
 
-                    this.food.push(new Food(200, 200, "a", true));
-                    console.log("et");
-                    return true;
-                }
+                this.next_question();
+                //console.log("et");
+                return true;
             }
         });
 
@@ -56,19 +64,55 @@ class Game {
             food.draw();
         });
 
-        console.log(this.player.segments.length);
+        //console.log(this.player.segments.length);
     }
 
     next_question() {
         this.food = [];
+
+        if (this.done.length == this.questions.length) {
+            alert(`Done! your score was ${this.score}`);
+            clearInterval(this.running);
+            return false;
+        }
         
-        const question = questions[Math.floor(Math.random() * questions.length)];
+        var qIndex = Math.floor(Math.random() * this.questions.length);
+        while (this.done.includes(qIndex) == true) {
+            qIndex = Math.floor(Math.random() * this.questions.length);
+        }
+        
+        const question_display = document.getElementById("question");
+        const answer_list = document.getElementById("answers");
+        
+        const question = this.questions[qIndex];
+        this.done.push(qIndex);
+        console.log(this.questions);
+        //console.log(question);
 
-        this.food.push(new Food(this.taken, question.answer, true));
+        question_display.innerHTML = question.question;
+        answer_list.innerHTML = "";
 
+        colors = colors.sort((a, b) => 0.5 - Math.random());
+
+        this.food.push(new Food(this.taken, question.answer, true, colors[0]));
+        var li = document.createElement("li");
+        li.innerHTML = question.answer;
+        li.style.backgroundColor = colors[0];
+        answer_list.appendChild(li);
+
+        
+        var i = 1;
         question.false_answers.forEach(ans => {
-            if (ans != null) this.food.push(new Food(this.taken, ans, false));
+            if (ans != null) this.food.push(new Food(this.player.segments[this.player.segments.length - 1], ans, false, colors[i]));
+            li = document.createElement("li");
+            li.innerHTML = ans;
+            li.style.backgroundColor = colors[i];
+            answer_list.appendChild(li);
+
+            i += 1;
         });
+
+        this.food = this.food.sort((a, b) => 0.5 - Math.random());
     }
 }
 
@@ -86,7 +130,7 @@ class Player {
     draw() {
         for (let i = 0; i < this.segments.length; i++) {
             this.segments[i].draw();
-            console.log(this.segments[i].x, this.segments[i].y);
+            //console.log(this.segments[i].x, this.segments[i].y);
         }
     }
 
@@ -115,7 +159,7 @@ class Head {
         this.dir = this.nextDir;
         this.x = this.x + 50 * directions[this.dir][0];
         this.y = this.y + 50 * directions[this.dir][1];
-        console.log(this.x, this.y);
+        //console.log(this.x, this.y);
         this.turned = false;
     }
 
@@ -136,7 +180,7 @@ class Head {
         ctx.lineTo(this.x - 25 * dx - 25 * dy, this.y - 25 * dy - 25 * dx);
         ctx.closePath();
         ctx.fill();
-        console.log("head");
+        //console.log("head");
     }
 }
 
@@ -179,27 +223,41 @@ class Segment {
 }
 
 class Food {
-    constructor(x, y, answer, correct) {
-        this.x = x;
-        this.y = y;
+    constructor(head, answer, correct, color) {
+        this.x = Math.floor(Math.random() * 19) * 50;
+        this.y = Math.floor(Math.random() * 9) * 50;
         
+        if (this.x >= head.x) this.x = this.x + 50;
+        if (this.y >= head.y) this.y = this.y + 50;
+
         this.answer = answer;
         this.correct = correct;
+        this.color = color;
     }
 
     draw() {
-        ctx.fillStyle = "red";
+        ctx.fillStyle = this.color;
         ctx.fillRect(this.x - 25, this.y - 25, 50, 50);
     }
 }
 
-const game = new Game();
-canvas.width = 480*2;
-canvas.height = 270*2;
+function start(questions) {
+    canvas.width = 1000;
+    canvas.height = 500;
+    
+
+    const game = new Game(questions);
+}
+
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('quiz');
+console.log(id);
 
-let questions = fetch(`/get_questions/${id}`).then(response => response.json());
+fetch(`/get_questions/${id}`)
+                    .then(response => response.json())
+                    .then(data => start(data));
+console.log(questions);
 
-setInterval(() => game.update(), 500);
+
+

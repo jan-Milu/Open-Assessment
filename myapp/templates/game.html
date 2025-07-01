@@ -1,10 +1,13 @@
 <!-- myapp/templates/login.html -->
-{% extends "base.html" %}
+{% extends "quizsnake.html" %}
 
 {% block title %}Game{% endblock %}
 
 {% block content %}
   <h2>Game</h2>
+
+  <p id="question"></p>
+  <ul id="answers"></ul>
 
   <canvas id="gameCanvas" width="800" height="400"></canvas>
   <script src="{{ url_for('static', filename='app.js') }}" defer="true"></script>
